@@ -39,7 +39,7 @@ def user():
         else:
             session["user"] = email
             flash("Logged in")
-        return redirect(url_for("rentals"))
+        return redirect(url_for("schedule_page"))
 
     return render_template("user/login.html")
     
@@ -121,13 +121,13 @@ def update_profile():
 @app.route("/schedule")
 @is_login
 def schedule_page():
-    return render_template('schedule_page.html')
+    return render_template('schedule/schedule_page.html')
 
 # Record page route
 @app.route("/record")
 @is_login
 def record_page():
-    return render_template('record_page.html')
+    return render_template('record/record_page.html')
 
 # Ship schedule form submission route
 @app.route("/ship_schedule", methods=["GET", "POST"])
@@ -196,7 +196,7 @@ def history():
         # Search in the database for the item
         flash(f"Search for {item} completed.")
         # Render a template or redirect as needed
-    return render_template('history.html')
+    return render_template('history/history.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
