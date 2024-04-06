@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}New Listing{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    <label for="location">Location</label>
+    <input name="location" id="location"
+      value="{{ request.form['location'] }}" required>
+
+    <label for="price">Price</label>
+    <input type="number" step="any" name="price" id="price"
+      value="{{ request.form['price'] }}" required>
+
+    <label for="num_room">Number of Rooms</label>
+    <input type="number" step="1" name="num_room" id="num_room"
+      value="{{ request.form['num_room'] }}" required>
+    <input type="submit" value="Create">
+</form>
+{% endblock %}

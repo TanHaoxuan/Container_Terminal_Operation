@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Update Listing{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+<h2>House Listing at {{ listing.location }}</h2>
+
+<form method="post">
+    <label for="location">Location</label>
+    <input name="location" id="location"
+      value="{{ request.form['location'] or listing.location }}" required>
+    <label for="price">Price</label>
+    <input name="price" id="price"
+      value="{{ request.form['price'] or listing.price }}" required>
+    <label for="num_room">Number of Rooms</label>
+    <input name="num_room" id="num_room"
+      value="{{ request.form['num_room'] or listing.num_room }}" required>
+    <input type="submit" value="Save">
+</form>
+
+<hr>
+<form action="{{ url_for('delete_listing', id = listing.id) }}" method="post">
+  <input class="danger" type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+</form>
+{% endblock %}

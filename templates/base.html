@@ -3,12 +3,22 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
     {% if "user" in session%}
-    <h1><a href="{{ url_for('rentals') }}">Container Terminal</a></h1>
+    <h1><a href="{{ url_for('rentals') }}">ShareMySGHouse</a></h1>
     {% else %}
-    <h1><a href="{{ url_for('user') }}">Container Terminal</a></h1>
+    <h1><a href="{{ url_for('user') }}">ShareMySGHouse</a></h1>
     {% endif%}
     <ul>
-
+        {% if "user" in session %}
+        <li><span>{{ session["user"] }}</span></li>
+        <li><a href="{{ url_for('update_profile') }}">Profile</a></li>
+        <li><a href="{{ url_for('bookings') }}">My Bookings</a></li>
+        <li><a href="{{ url_for('rentals') }}">For Rent</a></li>
+        <li><a href="{{ url_for('get_my_listings') }}">My Listings</a></li>
+        <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+        {% else %}
+        <li><a href="{{ url_for('user') }}">Register/Login</a></li>
+        {% endif %}
+    </ul>
 </nav>
 <section class="content">
     <header>

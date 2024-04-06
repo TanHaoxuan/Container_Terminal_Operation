@@ -1,0 +1,6 @@
+
+INSERT INTO movement (e_start_datetime, e_end_datetime, type, container_iso_id, ship_mmsi, des_bay, des_row, des_tier) VALUES	('2024-03-27 11:00:00','2024-03-27 15:00:00','Unload','AIT1',111001,1,1,1);
+INSERT INTO movement (e_start_datetime, e_end_datetime, type, container_iso_id, ship_mmsi, des_bay, des_row, des_tier) VALUES	('2024-03-27 11:00:00','2024-03-27 15:00:00','Unload','AIT2',111001,2,1,1);
+INSERT INTO movement (e_start_datetime, e_end_datetime, type, container_iso_id, ship_mmsi, des_bay, des_row, des_tier) VALUES	('2024-03-27 11:00:00','2024-03-27 15:00:00','Unload','AIT3',111001,3,1,1);
+INSERT INTO movement (e_start_datetime, e_end_datetime, type, container_iso_id, src_bay, src_row, src_tier, des_bay, des_row, des_tier) VALUES	('2024-03-27 11:00:00','2024-03-27 15:00:00','Transfer','SAP8',1,2,1,1,2,2);
+INSERT INTO movement (e_start_datetime, e_end_datetime, type, container_iso_id, ship_mmsi, src_bay, src_row, src_tier) VALUES	('2024-03-27 11:30:00','2024-03-27 12:00:00','Load','AIT1',111003,1,1,1);

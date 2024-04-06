@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}My profile{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<p>User {{user_fname}} {{user_lname}} is logged in!</p>
+<span>Email: {{user_email}}</span>
+
+
+<h2>Current Credit Card Details</h2>
+<table>
+    <thead>
+        <td>Type</td>
+        <td>Number</td>
+    </thead>
+    <tbody>
+        {% for types in curr_credit_card_types %}
+        <tr>
+            <td>{{types.type}}</td>
+            <td>{{types.number}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Update Details</h2>
+<form method="POST">
+<label for="password">Password</label>
+<input type="password" name="password" id="password">
+
+<input type="submit" value="Update Password">
+
+<hr>
+
+<label for="credit_card">Credit Card Number</label>
+<input type="text" name="credit_card" id="credit_card">
+
+<label for="credit_card_type">Credit Card Type</label>
+<select type="insert" name="credit_card_type" id="credit_card_type">
+    <option value="visa">Visa</option>
+    <option value="mastercard">Mastercard</option>
+</select>
+
+<label for="credit_card_action">Add/Delete</label>
+<select type="insert" name="credit_card_action" id="credit_card_action">
+    <option value="ADD">Add</option>
+    <option value="DELETE">Delete</option>
+</select>
+
+<input type="submit" value="Submit Credit card details">
+</form>
+{% endblock %}
