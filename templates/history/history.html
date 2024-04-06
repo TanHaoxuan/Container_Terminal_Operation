@@ -6,10 +6,15 @@
 
 {% block content %}
 <form method="post">
-    <label for="item">item</label>
-    <input name="item" id="item"
-      value="{{ request.form['item'] }}" required>
-
+    <label for="item">Item</label>
+    <select name="item" id="item" required>
+        <option value="">Please select an item</option>
+        <option value="item1">Ship</option>
+        <option value="item2">Container</option>
+        <option value="item3">Berth</option>
+        <option value="item4">Yard Location</option>
+        <!-- Add more options here -->
+    </select>
 
     <input type="submit" value="Search">
 </form>

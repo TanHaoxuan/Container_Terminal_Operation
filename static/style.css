@@ -300,7 +300,7 @@ th,td {
     display: inline-block; /* Display buttons inline */
     padding: 15px 25px; /* Add padding inside the button */
     margin: 10px; /* Add margin around buttons */
-    background-color: #2885e7; /* Background color of the button */
+    background-color: #8b9197; /* Background color of the button */
     color: white; /* Text color */
     text-decoration: none; /* Remove underline from links */
     border-radius: 5px; /* Rounded corners */
@@ -309,7 +309,63 @@ th,td {
   }
   
   .button-box:hover {
-    background-color: #0056b3; /* Darker shade for hover state */
+    background-color: #c5cacf; /* Darker shade for hover state */
     cursor: pointer; /* Change cursor to pointer */
   }
   
+  /* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.main-navigation {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.main-navigation h1 a, .main-navigation ul a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.main-navigation ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.main-navigation ul li {
+    margin-left: 20px;
+}
+
+.logout-button, .login-button {
+    background: #8896a5;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.flash {
+    background: #f2dede;
+    color: #a94442;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Add more styling based on your preferences */
