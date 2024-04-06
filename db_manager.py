@@ -158,11 +158,8 @@ def setup_database(db: sqlalchemy.engine.Connection) -> None:
     # if tables do not exist
     # create them
     drop_all_tables(db)
-    print("1")
     create_all_tables(db)
-    print("2")
     load_dummy_data(db)
-    print("3")
 
 
 def execute_sql(db: sqlalchemy.engine.Connection, command: str) -> List[sqlalchemy.engine.row.Row]:
