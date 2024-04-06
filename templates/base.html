@@ -3,9 +3,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
     {% if "user" in session%}
-    <h1><a href="{{ url_for('schedule_page') }}">Apa</a></h1>
+    <h1><a href="{{ url_for('schedule_page') }}"> Apasaja Pte Ltd</a></h1>
     {% else %}
-    <h1><a href="{{ url_for('user') }}">Apa</a></h1>
+    <h1><a href="{{ url_for('user') }}"> Apasaja Pte Ltd</a></h1>
     {% endif%}
     <ul>
         {% if "user" in session %}
