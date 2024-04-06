@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Schedule{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <hr>
+  <h1>Container Schedule</h1>
+  <form method="POST" action="{{ url_for('register') }}">
+    <label for="Container_ID">Container_ID</label>
+    <input name="Container_ID" id="Container_ID" required>
+
+    <label for="type">Ship MMSI</label>
+    <input name="type" id="type" required>
+
+    <label for="Expected_start">Expected arrival</label>
+    <input name="Expected_start" id="Expected_start" required>
+
+    <label for="Expected_end">Expected departure</label>
+    <input name="Expected_end" id="Expected_end" required>
+
+    <input type="submit" value="Sign up">
+  </form>
+
+{% endblock %}

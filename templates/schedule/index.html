@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Schedule{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <p>Please schedule a booking</p>
+    <div class="buttons">
+      <a href="{{ url_for('ship_schedule') }}" class="button">Ship</a>
+      <a href="{{ url_for('container_schedule') }}" class="button">Container</a>
+    </div>
+  </div>
+{% endblock %}

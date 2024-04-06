@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}History{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    <label for="item">item</label>
+    <input name="item" id="item"
+      value="{{ request.form['item'] }}" required>
+
+
+    <input type="submit" value="Search">
+</form>
+{% endblock %}
