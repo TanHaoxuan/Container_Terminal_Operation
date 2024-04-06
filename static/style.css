@@ -270,3 +270,46 @@ th,td {
 .table100.ver1 .ps__rail-y .ps__thumb-y::before {
     background-color: #ccc
 }
+
+
+.content {
+    /* Other existing styles */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center content */
+    align-items: center; /* Horizontally center content */
+    padding: 1rem;
+}
+
+.content h1 {
+    /* Other existing styles */
+    text-align: center; /* Center the heading text */
+    margin: 1rem 0; /* Add top and bottom margin */
+    padding: 0.5rem;
+    background-color: white; /* Match button color */
+    color: rgb(15, 15, 15); /* White text for contrast */
+    width: fit-content; /* Fit the width to the content */
+    border-radius: 10px; /* Rounded corners for the heading background */
+}
+.button-container {
+    text-align: center; /* Center the buttons */
+    margin: 20px;
+  }
+  
+  .button-box {
+    display: inline-block; /* Display buttons inline */
+    padding: 15px 25px; /* Add padding inside the button */
+    margin: 10px; /* Add margin around buttons */
+    background-color: #2885e7; /* Background color of the button */
+    color: white; /* Text color */
+    text-decoration: none; /* Remove underline from links */
+    border-radius: 5px; /* Rounded corners */
+    border: none; /* No border */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .button-box:hover {
+    background-color: #0056b3; /* Darker shade for hover state */
+    cursor: pointer; /* Change cursor to pointer */
+  }
+  
