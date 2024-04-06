@@ -141,7 +141,7 @@ def ship_schedule():
         # Add to database
         flash("Ship schedule submitted successfully.")
         return redirect(url_for("schedule_page"))
-    return render_template('ship_schedule.html')
+    return render_template('schedule/ship_schedule.html')
 
 # Container schedule form submission route
 @app.route("/container_schedule", methods=["GET", "POST"])
@@ -156,7 +156,7 @@ def container_schedule():
         # Add to database
         flash("Container schedule submitted successfully.")
         return redirect(url_for("schedule_page"))
-    return render_template('container_schedule.html')
+    return render_template('schedule/container_schedule.html')
 
 # Ship record form submission route
 @app.route("/ship_record", methods=["GET", "POST"])
@@ -170,7 +170,7 @@ def ship_record():
         # Add to database
         flash("Ship record submitted successfully.")
         return redirect(url_for("record_page"))
-    return render_template('ship_record.html')
+    return render_template('record/ship_record.html')
 
 # Container record form submission route
 @app.route("/container_record", methods=["GET", "POST"])
@@ -184,7 +184,7 @@ def container_record():
         # Add to database
         flash("Container record submitted successfully.")
         return redirect(url_for("record_page"))
-    return render_template('container_record.html')
+    return render_template('record/container_record.html')
 
 # History route
 @app.route("/history", methods=["GET", "POST"])
