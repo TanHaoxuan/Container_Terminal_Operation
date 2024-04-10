@@ -138,7 +138,25 @@ def ship_schedule():
         ship_mmsi = request.form.get("Ship_MMSI")
         expected_arrival = request.form.get("Expected_arrival")
         expected_departure = request.form.get("Expected_departure")
+        #find berth_id 
+        berth_id = execute_sql(db, 
+                    f"""
+                    SELECT berth_id
+                    FROM berth
+                    EXCEPT
+                    SELECT s.berth_id
+                    FROM ship_schedule s
+                    WHERE (s.e_departure > DATE '{expected_arrival}' OR s.a_departure > DATE '{expected_arrival}')
+                    AND (s.e_arrival < DATE '{expected_departure}' OR s.a_arrival < DATE '{expected_departure}');
+                    """)[0][0]
+        
         # Add to database
+        execute_update(db,
+            f'''
+            INSERT INTO ship_schedule (ship_mmsi, berth_id, e_arrival, e_departure) values
+            ({ship_mmsi}, {berth_id}, '{expected_arrival}', '{expected_departure}');
+            ''')
+        db.commit()
         flash("Ship schedule submitted successfully.")
         return redirect(url_for("schedule_page"))
     return render_template('schedule/ship_schedule.html')
