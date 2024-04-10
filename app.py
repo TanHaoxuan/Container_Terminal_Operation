@@ -303,8 +303,24 @@ def ship_record():
     if request.method == "POST":
         # Process form data and update the database as necessary
         ship_mmsi = request.form.get("Ship_MMSI")
-        actual_arrival = request.form.get("Actual_arrival")
+        schedule_type = request.form.get("schedule_type")
         actual_departure = request.form.get("Actual_departure")
+        if schedule_type == "Arrival":
+            actual_arrival = request.form.get("Actual_arrival")
+            execute_update(db,f'''
+                    UPDATE ship_schedule 
+                    SET a_arrival = '{actual_arrival}'
+                    WHERE ship_mmsi = '{ship_mmsi}'; 
+                    ''')
+            db.commit()
+        elif schedule_type == "Departure":
+            actual_departure = request.form.get("Actual_departure")
+            execute_update(db,f'''
+                    UPDATE ship_schedule 
+                    SET a_departure = '{actual_departure}'
+                    WHERE ship_mmsi = '{ship_mmsi}'; 
+                    ''')
+            db.commit()
         # Add to database
         flash("Ship record submitted successfully.")
         return redirect(url_for("record_page"))
