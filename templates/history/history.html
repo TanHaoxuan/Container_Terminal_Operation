@@ -9,13 +9,63 @@
     <label for="item">Item</label>
     <select name="item" id="item" required>
         <option value="">Please select an item</option>
-        <option value="item1">Ship</option>
-        <option value="item2">Container</option>
-        <option value="item3">Berth</option>
-        <option value="item4">Yard Location</option>
+        <option value="Ship">Ship</option>
+        <option value="Container">Container</option>
+        <option value="Movement">Movement</option>
+        <option value="Ship_Schedule">Ship Schedule</option>
         <!-- Add more options here -->
     </select>
 
     <input type="submit" value="Search">
 </form>
+
+<style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+    }
+
+    th, td {
+        border: 1px solid #dddddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+</style>
+
+
+{% if items %}
+  <h2>Ship Data</h2>
+  <table>
+    <thead>
+      <tr>
+        {% for column in columns %}
+          <th>{{ column }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        {% for column in columns %}
+          <td>{{ item[column] }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
 {% endblock %}

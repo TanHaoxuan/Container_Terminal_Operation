@@ -10,7 +10,7 @@ CORS(app)
 app.secret_key = 'the random string'
 
 # connect to database
-from db_manager import db, setup_database,execute_sql,execute_update
+from db_manager import db, setup_database,execute_sql,execute_update, execute_sql_fetch
 if (db == None):
     app.logger.error("Not able to connect to db")
     raise Exception("ERROR")
@@ -336,17 +336,17 @@ def container_record():
         if schedule_type == "Actual_start":
             actual_start = request.form.get("Actual_start")
             execute_update(db,f'''
-                    UPDATE movements 
+                    UPDATE movement 
                     SET a_start = '{actual_start}'
-                    WHERE movement_id = '{movement_id}'; 
+                    WHERE movement_id = {movement_id}; 
                     ''')
             db.commit()
         elif schedule_type == "Actual_end":
             actual_end = request.form.get("Actual_end")
             execute_update(db,f'''
-                    UPDATE movements 
+                    UPDATE movement 
                     SET a_end = '{actual_end}'
-                    WHERE movement_id = '{movement_id}'; 
+                    WHERE movement_id = {movement_id}; 
                     ''')
             db.commit()
         # Add to database
@@ -361,9 +361,39 @@ def history():
     if request.method == "POST":
         # Search logic using the item submitted from the form
         item = request.form.get("item")
-        # Search in the database for the item
-        flash(f"Search for {item} completed.")
-        # Render a template or redirect as needed
+        if item == "Ship":
+            ship_data, column_names = execute_sql_fetch(db,
+                    f'''
+                    SELECT * FROM ship;
+                    ''')
+            db.commit()
+            # Render a template or redirect as needed
+            return render_template('history/history.html', items = ship_data,  columns=column_names)
+        elif item == "Container":
+            container_data, column_names = execute_sql_fetch(db,
+                    f'''
+                    SELECT * FROM container;
+                    ''')
+            db.commit()
+            # Render a template or redirect as needed
+            return render_template('history/history.html', items = container_data,  columns=column_names)
+        elif item == "Movement":
+            movement_data, column_names = execute_sql_fetch(db,
+                    f'''
+                    SELECT * FROM movement;
+                    ''')
+            db.commit()
+            # Render a template or redirect as needed
+            return render_template('history/history.html', items = movement_data,  columns=column_names)
+        elif item == "Ship_Schedule":
+            ship_schdule_data, column_names = execute_sql_fetch(db,
+                    f'''
+                    SELECT * FROM ship_schdule;
+                    ''')
+            db.commit()
+            # Render a template or redirect as needed
+            return render_template('history/history.html', items = ship_schdule_data,  columns=column_names)
+ 
     return render_template('history/history.html')
 
 if __name__ == "__main__":

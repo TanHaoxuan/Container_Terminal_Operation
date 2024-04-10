@@ -386,6 +386,12 @@ def setup_database(db: sqlalchemy.engine.Connection) -> None:
 def execute_sql(db: sqlalchemy.engine.Connection, command: str) -> List[sqlalchemy.engine.row.Row]:
     return db.execute(text(command)).fetchall()
 
+def execute_sql_fetch(db: sqlalchemy.engine.Connection, command: str):
+    result = db.execute(text(command))
+    data = result.fetchall()
+    columns = result.keys()
+    return data, columns
+
 def execute_update(db: sqlalchemy.engine.Connection, command: str):
     db.execute(text(command))
     return
