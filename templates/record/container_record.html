@@ -6,30 +6,51 @@
 
 {% block content %}
   <hr>
-  <h1>Container Schedule</h1>
-  <form method="POST" action="{{ url_for('register') }}">
-    <label for="Container_ID">Container_ID</label>
-    <input name="Container_ID" id="Container_ID" required>
+  <h1>Container Record</h1>
+  <form method="POST" action="{{ url_for('container_record') }}">
+    <label for="movement_id">movement_id</label>
+    <input name="movement_id" id="movement_id" required>
 
-    <label for="type">type</label>
-    <input name="type" id="type" required>
+    <select name="schedule_type" id="schedule_type" required>
+        <option value="">Please select arrival or departure</option>
+        <option value="Arrival">Start Time</option>
+        <option value="Departure">End Time</option>
+        <!-- Add more options here -->
+    </select>
 
-    <label for="Actual_start">Actual start</label>
-    <input name="Actual_start" id="Actual_start" required>
+    <div id="Actual_start_container" style="display: none;">
+      <label for="Actual_start">Actual Start</label>
+      <input name="Actual_start" id="Actual_start" >
+    </div>
+    
+    <div id="Actual_end_container" style="display: none;">
+      <label for="Actual_end">Actual End</label>
+      <input name="Actual_end" id="Actual_end" >
+    </div>
 
-    <input type="submit" value="Record Start">
-
-
-    <label for="Container_ID">Container_ID</label>
-    <input name="Container_ID" id="Container_ID" required>
-
-    <label for="type">type</label>
-    <input name="type" id="type" required>
-
-    <label for="Actual_end">Actual end</label>
-    <input name="Actual_end" id="Actual_end" required>
-
-    <input type="submit" value="Record End">
+    <input type="submit" value="Record">
   </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const scheduleTypeSelect = document.getElementById('schedule_type');
+      const actualArrivalContainer = document.getElementById('Actual_start_container');
+      const actualDepartureContainer = document.getElementById('Actual_end_container');
+
+      scheduleTypeSelect.addEventListener('change', function () {
+        const selectedValue = this.value;
+        if (selectedValue === 'Arrival') {
+          actualArrivalContainer.style.display = '';
+          actualDepartureContainer.style.display = 'none';
+        } else if (selectedValue === 'Departure') {
+          actualArrivalContainer.style.display = 'none';
+          actualDepartureContainer.style.display = '';
+        } else {
+          actualArrivalContainer.style.display = 'none';
+          actualDepartureContainer.style.display = 'none';
+        }
+      });
+    });
+  </script>
 
 {% endblock %}
