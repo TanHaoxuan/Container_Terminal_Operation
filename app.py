@@ -388,7 +388,7 @@ def history():
         elif item == "Ship_Schedule":
             ship_schdule_data, column_names = execute_sql_fetch(db,
                     f'''
-                    SELECT * FROM ship_schdule;
+                    SELECT * FROM ship_schedule;
                     ''')
             db.commit()
             # Render a template or redirect as needed

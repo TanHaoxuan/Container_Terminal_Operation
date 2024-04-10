@@ -39,11 +39,11 @@
 
       scheduleTypeSelect.addEventListener('change', function () {
         const selectedValue = this.value;
-        if (selectedValue === 'Arrival') {
+        if (selectedValue === 'Actual_start') {
           actualArrivalContainer.style.display = '';
-          actualDepartureContainer.style.display = 'none';
-        } else if (selectedValue === 'Departure') {
-          actualArrivalContainer.style.display = 'none';
+          actualDepartureContainer.style.display = '';
+        } else if (selectedValue === 'Actual_end') {
+          actualArrivalContainer.style.display = '';
           actualDepartureContainer.style.display = '';
         } else {
           actualArrivalContainer.style.display = 'none';
