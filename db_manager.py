@@ -33,6 +33,14 @@ def drop_all_tables(db: sqlalchemy.engine.Connection) -> None:
 
 def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
     db.execute(text(
+        '''CREATE TABLE IF NOT EXISTS users(
+            email VARCHAR(50) PRIMARY KEY,
+            fname VARCHAR(32) NOT NULL,
+            lname VARCHAR(32) NOT NULL,
+            age INTEGER NOT NULL,
+            password VARCHAR(32))'''
+    ))
+    db.execute(text(
         '''CREATE TABLE IF NOT EXISTS ship (
             mmsi INT PRIMARY KEY,
             name VARCHAR(255),
