@@ -6,23 +6,51 @@
 
 {% block content %}
   <hr>
-  <h1>Ship Schedule</h1>
-  <form method="POST" action="{{ url_for('register') }}">
+  <h1>Ship Record</h1>
+  <form method="POST" action="{{ url_for('ship_record') }}">
     <label for="Ship_MMSI">Ship MMSI</label>
     <input name="Ship_MMSI" id="Ship_MMSI" required>
 
-    <label for="Actual_arrival">Actual arrival</label>
-    <input name="Actual_arrival" id="Actual_arrival" required>
+    <select name="schedule_type" id="schedule_type" required>
+        <option value="">Please select arrival or departure</option>
+        <option value="Arrival">Arrival</option>
+        <option value="Departure">Departure</option>
+        <!-- Add more options here -->
+    </select>
+
+    <div id="actual_arrival_container" style="display: none;">
+      <label for="Actual_arrival">Actual Arrival</label>
+      <input name="Actual_arrival" id="Actual_arrival" required>
+    </div>
     
-    <input type="submit" value="Record">
-
-    <label for="Ship_MMSI">Ship MMSI</label>
-    <input name="Ship_MMSI" id="Ship_MMSI" required>
-
-    <label for="Actual_departure">Actual departure</label>
-    <input name="Actual_departure" id="Actual_departure" required>
+    <div id="actual_departure_container" style="display: none;">
+      <label for="Actual_departure">Actual Departure</label>
+      <input name="Actual_departure" id="Actual_departure" required>
+    </div>
 
     <input type="submit" value="Record">
   </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const scheduleTypeSelect = document.getElementById('schedule_type');
+      const actualArrivalContainer = document.getElementById('actual_arrival_container');
+      const actualDepartureContainer = document.getElementById('actual_departure_container');
+
+      scheduleTypeSelect.addEventListener('change', function () {
+        const selectedValue = this.value;
+        if (selectedValue === 'Arrival') {
+          actualArrivalContainer.style.display = '';
+          actualDepartureContainer.style.display = 'none';
+        } else if (selectedValue === 'Departure') {
+          actualArrivalContainer.style.display = 'none';
+          actualDepartureContainer.style.display = '';
+        } else {
+          actualArrivalContainer.style.display = 'none';
+          actualDepartureContainer.style.display = 'none';
+        }
+      });
+    });
+  </script>
 
 {% endblock %}
