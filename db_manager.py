@@ -7,7 +7,7 @@ from typing import List
 load_dotenv('.env')
 # Replace the following with your actual connection details
 username = 'postgres'
-password = '000412'
+password = '000000'
 hostname = 'localhost:5432'
 database_name = 'Project'
 
@@ -260,11 +260,11 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
             END;
             $$ LANGUAGE plpgsql;
 
-            CREATE TRIGGER check_ship_at_berth_operation
-            BEFORE UPDATE ON movement
-            FOR EACH ROW
-            WHEN (NEW.type = 'Load' OR NEW.type = 'Unload')
-            EXECUTE FUNCTION check_ship_at_berth_during_operation();
+            --CREATE TRIGGER check_ship_at_berth_operation
+            --BEFORE UPDATE ON movement
+            --FOR EACH ROW
+            --WHEN (NEW.type = 'Load' OR NEW.type = 'Unload')
+            --EXECUTE FUNCTION check_ship_at_berth_during_operation();
 
             -- PREVENTS UNLOAD EVENT FROM BEING CREATED IF THE YARD LOCATION IS TAKEN AT TIME OF OPERATION
             CREATE OR REPLACE FUNCTION check_yard_location_avaiable_func()
