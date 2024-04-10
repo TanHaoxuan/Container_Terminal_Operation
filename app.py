@@ -304,7 +304,6 @@ def ship_record():
         # Process form data and update the database as necessary
         ship_mmsi = request.form.get("Ship_MMSI")
         schedule_type = request.form.get("schedule_type")
-        actual_departure = request.form.get("Actual_departure")
         if schedule_type == "Arrival":
             actual_arrival = request.form.get("Actual_arrival")
             execute_update(db,f'''
