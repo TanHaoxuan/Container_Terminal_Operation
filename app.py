@@ -287,7 +287,7 @@ def container_schedule():
                     INSERT INTO movement (container_iso_id,type,e_start,e_end,src_bay,src_row,src_tier,des_bay,des_row,des_tier) values 
                     ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {src_bay}, {src_row}, {src_tier}, {des_bay}, {des_row}, {des_tier}); 
                     ''') 
-            db.commit()
+                db.commit()
             flash("Container schedule submitted successfully.")
             return redirect(url_for("schedule_page"))
         except InternalError as e:
