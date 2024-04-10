@@ -168,10 +168,28 @@ def container_schedule():
     if request.method == "POST":
         # Process form data and update the database as necessary
         container_id = request.form.get("Container_ID")
-        ship_mmsi = request.form.get("type")  # The form has 'type', should it be 'ship_mmsi'?
+        movement_type = request.form.get("movement_type")
         expected_start = request.form.get("Expected_start")
         expected_end = request.form.get("Expected_end")
-        # Add to database
+        if movement_type == "Unload":
+            ship_mmsi = request.form.get("Ship_MMSI")
+            des_bay = request.form.get("des_bay")
+            des_row = request.form.get("des_row")
+            des_tier = request.form.get("des_tier")
+            execute_update(db,
+            f'''
+            INSERT INTO movement (container_iso_id,type,e_start,e_end,ship_mmsi,des_bay,des_row,des_tier) values
+            ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {ship_mmsi}, {des_bay}, {des_row}, {des_tier});
+            ''')
+            db.commit()
+        elif movement_type == "Load":
+            ship_mmsi = request.form.get("Ship_MMSI")
+        elif movement_type == "Transfer":
+            des_bay = request.form.get("des_bay")
+            des_row = request.form.get("des_row")
+            des_tier = request.form.get("des_tier")
+        
+        
         flash("Container schedule submitted successfully.")
         return redirect(url_for("schedule_page"))
     return render_template('schedule/container_schedule.html')
