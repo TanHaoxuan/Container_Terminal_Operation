@@ -331,9 +331,24 @@ def ship_record():
 def container_record():
     if request.method == "POST":
         # Process form data and update the database as necessary
-        container_id = request.form.get("Container_ID")
-        actual_start = request.form.get("Actual_start")
-        actual_end = request.form.get("Actual_end")
+        movement_id = request.form.get("movement_id")
+        schedule_type = request.form.get("schedule_type")
+        if schedule_type == "Actual_start":
+            actual_start = request.form.get("Actual_start")
+            execute_update(db,f'''
+                    UPDATE movements 
+                    SET a_start = '{actual_start}'
+                    WHERE movement_id = '{movement_id}'; 
+                    ''')
+            db.commit()
+        elif schedule_type == "Actual_end":
+            actual_end = request.form.get("Actual_end")
+            execute_update(db,f'''
+                    UPDATE movements 
+                    SET a_end = '{actual_end}'
+                    WHERE movement_id = '{movement_id}'; 
+                    ''')
+            db.commit()
         # Add to database
         flash("Container record submitted successfully.")
         return redirect(url_for("record_page"))
