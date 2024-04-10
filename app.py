@@ -1,6 +1,7 @@
 from flask_cors import CORS
 from flask import Flask, flash, redirect, request, Response, render_template, url_for, session
 from helpers import credit_card_operation, check_credit_card, is_login
+from sqlalchemy.exc import InternalError
 
 # Instantiate object app
 app = Flask(__name__, template_folder='templates')
@@ -166,32 +167,133 @@ def ship_schedule():
 @is_login
 def container_schedule():
     if request.method == "POST":
-        # Process form data and update the database as necessary
-        container_id = request.form.get("Container_ID")
-        movement_type = request.form.get("movement_type")
-        expected_start = request.form.get("Expected_start")
-        expected_end = request.form.get("Expected_end")
-        if movement_type == "Unload":
-            ship_mmsi = request.form.get("Ship_MMSI")
-            des_bay = request.form.get("des_bay")
-            des_row = request.form.get("des_row")
-            des_tier = request.form.get("des_tier")
-            execute_update(db,
-            f'''
-            INSERT INTO movement (container_iso_id,type,e_start,e_end,ship_mmsi,des_bay,des_row,des_tier) values
-            ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {ship_mmsi}, {des_bay}, {des_row}, {des_tier});
-            ''')
+        try:
+            # Process form data and update the database as necessary
+            container_id = request.form.get("Container_ID")
+            movement_type = request.form.get("movement_type")
+            expected_start = request.form.get("Expected_start")
+            expected_end = request.form.get("Expected_end")
+            if movement_type == "Unload":
+                ship_mmsi = request.form.get("Ship_MMSI")
+                des_bay = request.form.get("des_bay")
+                des_row = request.form.get("des_row")
+                des_tier = request.form.get("des_tier")
+                execute_update(db,
+                f'''
+                INSERT INTO movement (container_iso_id,type,e_start,e_end,ship_mmsi,des_bay,des_row,des_tier) values
+                ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {ship_mmsi}, {des_bay}, {des_row}, {des_tier});
+                ''')
+                db.commit()
+            elif movement_type == "Load":
+                ship_mmsi = request.form.get("Ship_MMSI")
+                #find current location of the container  
+                src_bay = execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][0] 
+                src_row = execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][1] 
+                src_tier =execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][2] 
+                execute_update(db, 
+                f''' 
+                INSERT INTO movement (container_iso_id,type,e_start,e_end,ship_mmsi,src_bay,src_row,src_tier) values 
+                ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {ship_mmsi}, {src_bay}, {src_row}, {src_tier}); 
+                ''')
+                db.commit()
+            elif movement_type == "Transfer":
+                des_bay = request.form.get("des_bay")
+                des_row = request.form.get("des_row")
+                des_tier = request.form.get("des_tier")
+                #find current location of the container  
+                src_bay = execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][0] 
+                src_row = execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][1] 
+                src_tier =execute_sql(db,  
+                        f"""
+                        -- Find out where the container is last at
+                        SELECT m.des_bay, m.des_row, m.des_tier
+                        FROM movement m, (
+                            SELECT container_iso_id, GREATEST(MAX(e_end), MAX(a_end)) AS latest
+                            FROM movement
+                            WHERE container_iso_id = '{container_id}'
+                            AND (type='Transfer' OR type='Unload')
+                            GROUP BY container_iso_id
+                        ) l
+                        WHERE (l.latest = m.a_end OR l.latest = m.e_end)
+                        AND m.container_iso_id = l.container_iso_id;
+                        """)[0][2] 
+                execute_update(db, 
+                    f''' 
+                    INSERT INTO movement (container_iso_id,type,e_start,e_end,src_bay,src_row,src_tier,des_bay,des_row,des_tier) values 
+                    ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {src_bay}, {src_row}, {src_tier}, {des_bay}, {des_row}, {des_tier}); 
+                    ''') 
             db.commit()
-        elif movement_type == "Load":
-            ship_mmsi = request.form.get("Ship_MMSI")
-        elif movement_type == "Transfer":
-            des_bay = request.form.get("des_bay")
-            des_row = request.form.get("des_row")
-            des_tier = request.form.get("des_tier")
-        
-        
-        flash("Container schedule submitted successfully.")
-        return redirect(url_for("schedule_page"))
+            flash("Container schedule submitted successfully.")
+            return redirect(url_for("schedule_page"))
+        except InternalError as e:
+            error_message = str(e)
+            flash("An error occurred: " + error_message, "error")
+            return render_template('schedule/container_schedule.html')
     return render_template('schedule/container_schedule.html')
 
 # Ship record form submission route
