@@ -7,20 +7,69 @@
 {% block content %}
   <hr>
   <h1>Container Schedule</h1>
-  <form method="POST" action="{{ url_for('register') }}">
-    <label for="Container_ID">Container_ID</label>
+  <form method="POST" action="{{ url_for('container_schedule') }}">
+    <label for="Container_ID">Container ID</label>
     <input name="Container_ID" id="Container_ID" required>
 
-    <label for="type">Ship MMSI</label>
-    <input name="type" id="type" required>
-
-    <label for="Expected_start">Expected arrival</label>
+    <label for="Expected_start">Expected Start</label>
     <input name="Expected_start" id="Expected_start" required>
 
-    <label for="Expected_end">Expected departure</label>
+    <label for="Expected_end">Expected End</label>
     <input name="Expected_end" id="Expected_end" required>
+
+    <select name="movement_type" id="movement_type" required>
+      <option value="">Please select a movement type</option>
+      <option value="Load">Load</option>
+      <option value="Unload">Unload</option>
+      <option value="Transfer">Transfer</option>
+      <!-- Add more options here -->
+    </select>
+
+    <div id="ship_mmsi_container" style="display: none;">
+      <label for="Ship_MMSI">Destination Ship MMSI</label>
+      <input name="Ship_MMSI" id="Ship_MMSI" required>
+    </div>
+
+    <div id="destination_container" style="display: none;">
+      <label for="des_bay">Destination Bay</label>
+      <input name="des_bay" id="des_bay" required>
+
+      <label for="des_row">Destination Row</label>
+      <input name="des_row" id="des_row" required>
+
+      <label for="des_tier">Destination Tier</label>
+      <input name="des_tier" id="des_tier" required>
+    </div>
+
 
     <input type="submit" value="Schedule">
   </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loadingTypeSelect = document.getElementById('movement_type');
+      const shipMmsiContainer = document.getElementById('ship_mmsi_container');
+      const destinationContainer = document.getElementById('destination_container');
+
+      loadingTypeSelect.addEventListener('change', function () {
+        const selectedValue = this.value;
+        switch (selectedValue) {
+          case 'Load':
+            shipMmsiContainer.style.display = '';
+            destinationContainer.style.display = 'none';
+            break;
+          case 'Unload':
+          case 'Transfer':
+            shipMmsiContainer.style.display = 'none';
+            destinationContainer.style.display = '';
+            break;
+          default:
+            shipMmsiContainer.style.display = 'none';
+            destinationContainer.style.display = 'none';
+            break;
+        }
+      });
+    });
+  </script>
 
 {% endblock %}
