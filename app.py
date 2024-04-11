@@ -1,6 +1,6 @@
 from flask_cors import CORS
+from functools import wraps
 from flask import Flask, flash, redirect, request, Response, render_template, url_for, session
-from helpers import credit_card_operation, check_credit_card, is_login
 from sqlalchemy.exc import InternalError
 
 # Instantiate object app
@@ -16,6 +16,17 @@ if (db == None):
     raise Exception("ERROR")
 setup_database(db)
 app.logger.info("Database created and populated")
+
+# Login function
+def is_login(f):
+    @wraps(f)
+    def decorated_func(*args, **kwargs):
+        if "user" in session:
+            return f(*args, **kwargs)
+        else:
+            flash("Please log in before using the system")
+            return redirect(url_for("user"))
+    return decorated_func
 
 
 @app.route("/")
@@ -73,50 +84,6 @@ def register():
 def logout():
     session.pop("user", None)
     return redirect(url_for("user"))
-
-@app.route('/profile', methods=('GET', 'POST')) #char or int
-@is_login
-def update_profile():
-    email = session["user"]
-
-    if request.method == 'POST':
-        password = request.form['password']
-        credit_card = request.form['credit_card']
-        credit_card_type = request.form['credit_card_type']
-        credit_card_action = request.form['credit_card_action']
-        if password:
-            execute_update(db,f'''
-                    UPDATE users 
-                    SET password = '{password}'
-                    WHERE email = '{email}'; 
-                    ''')
-            db.commit()
-            flash('Updated your password!')
-            
-        ## Update credit card only
-        elif (credit_card and credit_card_type):
-            message = check_credit_card(credit_card_action, credit_card, credit_card_type, email)
-            if message:
-                flash(message)
-            else: 
-                credit_card_operation(credit_card_action, credit_card, credit_card_type, email)
-                flash(f"Updated your credit card!")
-        elif credit_card or credit_card_type:
-            flash('Both Credit Card Number & Type required to Update!')
-        elif not password and (credit_card and credit_card_type):
-            flash('Nothing filled in. No changes made.')
-            
-    curr_credit_card_types = execute_sql(db, f'''
-            SELECT * FROM credit_cards WHERE email = '{email}';
-            ''')
-    user = execute_sql(db, f'''
-            SELECT * FROM users WHERE email = '{email}';
-            ''')[0]
-    return render_template('user/profile.html',
-                curr_credit_card_types=curr_credit_card_types,
-                user_fname=user.fname,
-                user_lname=user.lname,
-                user_email=user.email)
 
 # Schedule page route
 @app.route("/schedule")
