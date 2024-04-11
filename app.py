@@ -1,7 +1,7 @@
 from flask_cors import CORS
 from functools import wraps
 from flask import Flask, flash, redirect, request, Response, render_template, url_for, session
-from sqlalchemy.exc import InternalError
+from sqlalchemy.exc import SQLAlchemyError 
 
 # Instantiate object app
 app = Flask(__name__, template_folder='templates')
@@ -102,37 +102,42 @@ def record_page():
 @is_login
 def ship_schedule():
     if request.method == "POST":
-        # Process form data and update the database as necessary
-        ship_mmsi = request.form.get("Ship_MMSI")
-        expected_arrival = request.form.get("Expected_arrival")
-        expected_departure = request.form.get("Expected_departure")
-        #find berth_id 
-        berth_id = execute_sql(db, 
-                    f"""
-                    SELECT berth_id
-                    FROM berth
-                    EXCEPT
-                    SELECT s.berth_id
-                    FROM ship_schedule s
-                    WHERE (s.e_departure > DATE '{expected_arrival}' OR s.a_departure > DATE '{expected_arrival}')
-                    AND (s.e_arrival < DATE '{expected_departure}' OR s.a_arrival < DATE '{expected_departure}');
-                    """)[0][0]
-        
-        # Add to database
-        execute_update(db,
-            f'''
-            INSERT INTO ship_schedule (ship_mmsi, berth_id, e_arrival, e_departure) values
-            ({ship_mmsi}, {berth_id}, '{expected_arrival}', '{expected_departure}');
-            ''')
-        db.commit()
-        schedule_id = execute_sql(db, 
-                    f"""
-                    SELECT schedule_id
-                    FROM ship_schedule s
-                    WHERE s.ship_mmsi = '{ship_mmsi}' AND s.berth_id = '{berth_id}' AND s.e_arrival = '{expected_arrival}' AND s.e_departure = '{expected_departure}';
-                    """)[0][0]
-        flash(f"Ship schedule submitted successfully. schedule_id = {schedule_id}")
-        return redirect(url_for("schedule_page"))
+        try:
+            # Process form data and update the database as necessary
+            ship_mmsi = request.form.get("Ship_MMSI")
+            expected_arrival = request.form.get("Expected_arrival")
+            expected_departure = request.form.get("Expected_departure")
+            #find berth_id 
+            berth_id = execute_sql(db, 
+                        f"""
+                        SELECT berth_id
+                        FROM berth
+                        EXCEPT
+                        SELECT s.berth_id
+                        FROM ship_schedule s
+                        WHERE (s.e_departure > DATE '{expected_arrival}' OR s.a_departure > DATE '{expected_arrival}')
+                        AND (s.e_arrival < DATE '{expected_departure}' OR s.a_arrival < DATE '{expected_departure}');
+                        """)[0][0]
+            
+            # Add to database
+            execute_update(db,
+                f'''
+                INSERT INTO ship_schedule (ship_mmsi, berth_id, e_arrival, e_departure) values
+                ({ship_mmsi}, {berth_id}, '{expected_arrival}', '{expected_departure}');
+                ''')
+            db.commit()
+            schedule_id = execute_sql(db, 
+                        f"""
+                        SELECT schedule_id
+                        FROM ship_schedule s
+                        WHERE s.ship_mmsi = '{ship_mmsi}' AND s.berth_id = '{berth_id}' AND s.e_arrival = '{expected_arrival}' AND s.e_departure = '{expected_departure}';
+                        """)[0][0]
+            flash(f"Ship schedule submitted successfully. schedule_id = {schedule_id}")
+            return redirect(url_for("schedule_page"))
+        except SQLAlchemyError as e:
+            error_message = str(e)
+            flash("An error occurred: " + error_message, "error")
+            return render_template('schedule/ship_schedule.html')
     return render_template('schedule/ship_schedule.html')
 
 # Container schedule form submission route
