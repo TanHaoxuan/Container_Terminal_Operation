@@ -361,8 +361,8 @@ def load_dummy_data(db: sqlalchemy.engine.Connection) -> None:
     db.execute(text("".join(open("sql_data/containers.sql", "r").readlines())))
     db.execute(text("".join(open("sql_data/berths.sql", "r").readlines())))
     db.execute(text("".join(open("sql_data/yard_locations.sql", "r").readlines())))
-    db.execute(text("".join(open("sql_data/ship_schedule.sql", "r").readlines())))
-    db.execute(text("".join(open("sql_data/movements.sql", "r").readlines())))
+    #db.execute(text("".join(open("sql_data/ship_schedule.sql", "r").readlines())))
+    #db.execute(text("".join(open("sql_data/movements.sql", "r").readlines())))
     db.commit()
     print("ALL DATA POPULATED")
 
