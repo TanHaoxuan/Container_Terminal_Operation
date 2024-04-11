@@ -255,7 +255,14 @@ def container_schedule():
                     ('{container_id}', '{movement_type}', '{expected_start}', '{expected_end}', {src_bay}, {src_row}, {src_tier}, {des_bay}, {des_row}, {des_tier}); 
                     ''') 
                 db.commit()
-            flash("Container schedule submitted successfully.")
+            movement_id = execute_sql(db, 
+                    f"""
+                    SELECT movement_id
+                    FROM movement m
+                    WHERE m.container_iso_id = '{container_id}' AND m.type = '{movement_type}' AND m.e_start = '{expected_start}' AND m.e_end = '{expected_end}';
+                    """)[0][0]
+            print(movement_id)
+            flash(f"Container schedule submitted successfully. movement_id = {movement_id}")
             return redirect(url_for("schedule_page"))
         except InternalError as e:
             error_message = str(e)
