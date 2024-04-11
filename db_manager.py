@@ -126,11 +126,13 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
                 INTO conflict_count
                 FROM ship_schedule
                 WHERE ship_mmsi = NEW.ship_mmsi
-                AND ((NEW.e_arrival BETWEEN e_arrival AND e_departure)
-                OR (NEW.e_departure BETWEEN e_arrival AND e_departure));
+                AND ((CASE  WHEN a_arrival IS NOT NULL THEN a_arrival
+                    ELSE e_arrival END) <= NEW.e_departure)
+                AND ((CASE  WHEN a_departure IS NOT NULL THEN a_departure
+                    ELSE e_departure END) >= NEW.e_arrival);
 
                 IF conflict_count > 0 THEN
-                    RAISE EXCEPTION 'Time schedule conflict for ship % at %', NEW.ship_mmsi, NEW.e_start;
+                    RAISE EXCEPTION 'Time schedule conflict for ship % at %', NEW.ship_mmsi, NEW.e_arrival;
                 END IF;
                 RETURN NEW;
             END;
@@ -282,18 +284,18 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
                     SELECT l1.bay, l1.row, l1.tier
                     FROM movement m1, (
                         -- Latest operation timing concerning each yard location (if any)
-                        SELECT y.bay, y.row, y.tier, GREATEST(MAX(m.e_end), MAX(m.a_end)) AS latest
+                        SELECT y.bay, y.row, y.tier, LEAST(MAX(m.e_start), MAX(m.a_start)) AS latest
                         FROM movement m, yard_location y
                         WHERE ((y.bay=m.src_bay AND y.row=m.src_row AND y.tier=m.src_tier)
                         OR (y.bay=m.des_bay AND y.row=m.des_row AND y.tier=m.des_tier))
-                        AND (m.a_end <= NEW.e_start OR m.e_end <= NEW.e_start)
+                        AND (m.a_start <= NEW.e_start OR m.e_start <= NEW.e_start)
                         GROUP BY (y.bay, y.row, y.tier)
                     ) l1
-                    WHERE (m1.a_end = l1.latest OR m1.e_end = l1.latest)
+                    WHERE (m1.a_start = l1.latest OR m1.e_start = l1.latest)
                     AND m1.des_bay=l1.bay AND m1.des_row=l1.row AND m1.des_tier=l1.tier
                     AND (m1.type = 'Unload' OR m1.type = 'Transfer')
                 ) t
-                WHERE t.bay=NEW.des_bay AND t.row=NEW.des_row AND t.row=NEW.des_row;
+                WHERE t.bay=NEW.des_bay AND t.row=NEW.des_row AND t.tier=NEW.des_tier;
                 
                 -- If there are, raise an exception
                 IF location_is_available = 0 THEN
@@ -309,7 +311,7 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
             CREATE TRIGGER check_yard_location_avaiable
             BEFORE INSERT OR UPDATE ON movement
             FOR EACH ROW
-            WHEN (NEW.type = 'Unload')
+            WHEN (NEW.type = 'Unload' OR NEW.type = 'Transfer')
             EXECUTE FUNCTION check_yard_location_avaiable_func();
 
             -- PREVENTS TRANSFER/LOAD EVENT FROM BEING CREATED IF THE CONTAINER IS NOT AT THE SPECIFIED YARD LOCATION
