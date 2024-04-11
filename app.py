@@ -125,7 +125,13 @@ def ship_schedule():
             ({ship_mmsi}, {berth_id}, '{expected_arrival}', '{expected_departure}');
             ''')
         db.commit()
-        flash("Ship schedule submitted successfully.")
+        schedule_id = execute_sql(db, 
+                    f"""
+                    SELECT schedule_id
+                    FROM ship_schedule s
+                    WHERE s.ship_mmsi = '{ship_mmsi}' AND s.berth_id = '{berth_id}' AND s.e_arrival = '{expected_arrival}' AND s.e_departure = '{expected_departure}';
+                    """)[0][0]
+        flash(f"Ship schedule submitted successfully. schedule_id = {schedule_id}")
         return redirect(url_for("schedule_page"))
     return render_template('schedule/ship_schedule.html')
 
@@ -261,7 +267,6 @@ def container_schedule():
                     FROM movement m
                     WHERE m.container_iso_id = '{container_id}' AND m.type = '{movement_type}' AND m.e_start = '{expected_start}' AND m.e_end = '{expected_end}';
                     """)[0][0]
-            print(movement_id)
             flash(f"Container schedule submitted successfully. movement_id = {movement_id}")
             return redirect(url_for("schedule_page"))
         except InternalError as e:
