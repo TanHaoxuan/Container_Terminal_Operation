@@ -135,6 +135,7 @@ def ship_schedule():
             flash(f"Ship schedule submitted successfully. schedule_id = {schedule_id}")
             return redirect(url_for("schedule_page"))
         except SQLAlchemyError as e:
+            db.rollback()
             error_message = str(e)
             flash("An error occurred: " + error_message, "error")
             return render_template('schedule/ship_schedule.html')
@@ -274,7 +275,7 @@ def container_schedule():
                     """)[0][0]
             flash(f"Container schedule submitted successfully. movement_id = {movement_id}")
             return redirect(url_for("schedule_page"))
-        except InternalError as e:
+        except SQLAlchemyError as e:
             error_message = str(e)
             flash("An error occurred: " + error_message, "error")
             return render_template('schedule/container_schedule.html')
@@ -285,28 +286,34 @@ def container_schedule():
 @is_login
 def ship_record():
     if request.method == "POST":
-        # Process form data and update the database as necessary
-        ship_mmsi = request.form.get("Ship_MMSI")
-        schedule_type = request.form.get("schedule_type")
-        if schedule_type == "Arrival":
-            actual_arrival = request.form.get("Actual_arrival")
-            execute_update(db,f'''
-                    UPDATE ship_schedule 
-                    SET a_arrival = '{actual_arrival}'
-                    WHERE ship_mmsi = '{ship_mmsi}'; 
-                    ''')
-            db.commit()
-        elif schedule_type == "Departure":
-            actual_departure = request.form.get("Actual_departure")
-            execute_update(db,f'''
-                    UPDATE ship_schedule 
-                    SET a_departure = '{actual_departure}'
-                    WHERE ship_mmsi = '{ship_mmsi}'; 
-                    ''')
-            db.commit()
-        # Add to database
-        flash("Ship record submitted successfully.")
-        return redirect(url_for("record_page"))
+        try:
+            # Process form data and update the database as necessary
+            schedule_id = request.form.get("schedule_id")
+            schedule_type = request.form.get("schedule_type")
+            if schedule_type == "Arrival":
+                actual_arrival = request.form.get("Actual_arrival")
+                execute_update(db,f'''
+                        UPDATE ship_schedule 
+                        SET a_arrival = '{actual_arrival}'
+                        WHERE schedule_id = '{schedule_id}'; 
+                        ''')
+                db.commit()
+            elif schedule_type == "Departure":
+                actual_departure = request.form.get("Actual_departure")
+                execute_update(db,f'''
+                        UPDATE ship_schedule 
+                        SET a_departure = '{actual_departure}'
+                        WHERE ship_mmsi = '{ship_mmsi}'; 
+                        ''')
+                db.commit()
+            # Add to database
+            flash("Ship record submitted successfully.")
+            return redirect(url_for("record_page"))
+        except SQLAlchemyError as e:
+            db.rollback()
+            error_message = str(e)
+            flash("An error occurred: " + error_message, "error")
+            return render_template('record/ship_record.html')
     return render_template('record/ship_record.html')
 
 # Container record form submission route

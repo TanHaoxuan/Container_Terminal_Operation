@@ -8,8 +8,8 @@
   <hr>
   <h1>Ship Record</h1>
   <form method="POST" action="{{ url_for('ship_record') }}">
-    <label for="Ship_MMSI">Ship MMSI</label>
-    <input name="Ship_MMSI" id="Ship_MMSI" required>
+    <label for="schedule_id">Ship Schedule ID</label>
+    <input name="schedule_id" id="schedule_id" required>
 
     <select name="schedule_type" id="schedule_type" required>
         <option value="">Please select arrival or departure</option>
