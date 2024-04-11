@@ -276,6 +276,7 @@ def container_schedule():
             flash(f"Container schedule submitted successfully. movement_id = {movement_id}")
             return redirect(url_for("schedule_page"))
         except SQLAlchemyError as e:
+            db.rollback()
             error_message = str(e)
             flash("An error occurred: " + error_message, "error")
             return render_template('schedule/container_schedule.html')
@@ -303,7 +304,7 @@ def ship_record():
                 execute_update(db,f'''
                         UPDATE ship_schedule 
                         SET a_departure = '{actual_departure}'
-                        WHERE ship_mmsi = '{ship_mmsi}'; 
+                        WHERE schedule_id = '{schedule_id}'; 
                         ''')
                 db.commit()
             # Add to database
@@ -321,28 +322,34 @@ def ship_record():
 @is_login
 def container_record():
     if request.method == "POST":
-        # Process form data and update the database as necessary
-        movement_id = request.form.get("movement_id")
-        schedule_type = request.form.get("schedule_type")
-        if schedule_type == "Actual_start":
-            actual_start = request.form.get("Actual_start")
-            execute_update(db,f'''
-                    UPDATE movement 
-                    SET a_start = '{actual_start}'
-                    WHERE movement_id = {movement_id}; 
-                    ''')
-            db.commit()
-        elif schedule_type == "Actual_end":
-            actual_end = request.form.get("Actual_end")
-            execute_update(db,f'''
-                    UPDATE movement 
-                    SET a_end = '{actual_end}'
-                    WHERE movement_id = {movement_id}; 
-                    ''')
-            db.commit()
-        # Add to database
-        flash("Container record submitted successfully.")
-        return redirect(url_for("record_page"))
+        try:
+            # Process form data and update the database as necessary
+            movement_id = request.form.get("movement_id")
+            schedule_type = request.form.get("schedule_type")
+            if schedule_type == "Actual_start":
+                actual_start = request.form.get("Actual_start")
+                execute_update(db,f'''
+                        UPDATE movement 
+                        SET a_start = '{actual_start}'
+                        WHERE movement_id = {movement_id}; 
+                        ''')
+                db.commit()
+            elif schedule_type == "Actual_end":
+                actual_end = request.form.get("Actual_end")
+                execute_update(db,f'''
+                        UPDATE movement 
+                        SET a_end = '{actual_end}'
+                        WHERE movement_id = {movement_id}; 
+                        ''')
+                db.commit()
+            # Add to database
+            flash("Container record submitted successfully.")
+            return redirect(url_for("record_page"))
+        except SQLAlchemyError as e:
+            db.rollback()
+            error_message = str(e)
+            flash("An error occurred: " + error_message, "error")
+            return render_template('record/container_record.html')
     return render_template('record/container_record.html')
 
 # History route

@@ -286,7 +286,7 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
                         FROM movement m, yard_location y
                         WHERE ((y.bay=m.src_bay AND y.row=m.src_row AND y.tier=m.src_tier)
                         OR (y.bay=m.des_bay AND y.row=m.des_row AND y.tier=m.des_tier))
-                        AND (m.a_end <= '2024-04-09 08:15:00' OR m.e_end <= '2024-04-09 08:15:00')
+                        AND (m.a_end <= NEW.e_start OR m.e_end <= NEW.e_start)
                         GROUP BY (y.bay, y.row, y.tier)
                     ) l1
                     WHERE (m1.a_end = l1.latest OR m1.e_end = l1.latest)
@@ -331,7 +331,7 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
                 LIMIT 1;
                 
                 -- If containers do not match, raise an exception
-                IF container_at_location <> NEW.container_iso_id THEN
+                IF ((container_at_location IS NULL) OR (container_at_location <> NEW.container_iso_id)) THEN
                     RAISE EXCEPTION 'Container % is not at the expected yard location at start time of operation (%).', 
                     NEW.container_iso_id, NEW.e_start;
                 END IF;
@@ -345,7 +345,38 @@ def create_all_tables(db: sqlalchemy.engine.Connection) -> None:
             BEFORE INSERT OR UPDATE ON movement
             FOR EACH ROW
             WHEN (NEW.type = 'Transfer' OR NEW.type = 'Load')
-            EXECUTE FUNCTION check_container_at_correct_location_during_operation_func()
+            EXECUTE FUNCTION check_container_at_correct_location_during_operation_func();
+            
+            -- PREVENTS UNLOAD EVENT FROM BEING CREATED IF THE CONTAINER IS ALREADY IN YARD LOCATION
+            CREATE OR REPLACE FUNCTION check_container_already_in_yard_func()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                last_movement_type VARCHAR(10);
+            BEGIN
+                -- Check the last movement operation type for the container
+                SELECT type 
+            INTO last_movement_type
+                FROM movement
+                WHERE container_iso_id = NEW.container_iso_id
+            AND (NEW.e_start >= e_end OR
+            NEW.e_start >= a_end)
+                ORDER BY a_end DESC
+                LIMIT 1;
+                -- If the last operation was 'Unload', raise an exception
+                IF last_movement_type = 'Unload' THEN
+                    RAISE EXCEPTION 'Container % was already unloaded. Cannot insert the new operation.', NEW.container_iso_id;
+                END IF;
+
+                -- If the check passes, allow the insert to proceed
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER check_container_already_in_yard
+            BEFORE INSERT OR UPDATE ON movement
+            FOR EACH ROW
+            WHEN (NEW.type = 'Unload')
+            EXECUTE FUNCTION check_container_already_in_yard_func();
         ;'''
     ))
 
