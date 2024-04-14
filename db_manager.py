@@ -7,7 +7,7 @@ from typing import List
 load_dotenv('.env')
 # Replace the following with your actual connection details
 username = 'postgres'
-password = '000412'
+password = '000000'
 hostname = 'localhost:5432'
 database_name = 'Project'
 
